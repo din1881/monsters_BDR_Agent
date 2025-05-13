@@ -1,0 +1,7 @@
+fastapi
+pydantic
+requests
+python-dotenv
+langchain
+langchain-community
+langchain-openai

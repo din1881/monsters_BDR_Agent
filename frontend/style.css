@@ -1,0 +1,57 @@
+body {
+    font-family: "Segoe UI", sans-serif;
+    background-color: #f4f7fa;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    color: #3f51b5;
+    margin-bottom: 30px;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 8px 10px; /* Reduced padding to make them smaller */
+    margin: 8px 0; /* Reduced margin */
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 14px; /* Smaller font size */
+}
+
+button {
+    background-color: #3f51b5;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #303f9f;
+}
+
+/* Scrolling functionality for the results section */
+.results-container {
+    max-height: 400px; /* Set the height limit for the scrolling container */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    padding-right: 10px; /* Prevent content from being cut off */
+}
