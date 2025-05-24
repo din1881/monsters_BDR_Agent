@@ -215,21 +215,40 @@ async def find_leads(query: ApolloSearchRequest):
         response.raise_for_status()
         people = response.json().get("people", [])
         leads_created = []
+        
+        # Enrich each person's data to get emails
         for person in people:
+            # Enrichment request
+            enrich_url = "https://api.apollo.io/api/v1/people/match"
+            enrich_payload = {
+                "first_name": person.get("first_name", ""),
+                "last_name": person.get("last_name", ""),
+                "organization_name": person.get("organization", {}).get("name", ""),
+                "linkedin_url": person.get("linkedin_url", ""),
+                "reveal_personal_emails": True
+            }
+            
+            enrich_response = requests.post(enrich_url, headers=headers, json=enrich_payload)
+            enrich_response.raise_for_status()
+            enriched_data = enrich_response.json().get("person", {})
+            
+            # Use enriched data if available, otherwise fall back to original data
             lead_data = LeadRequest(
-                firstname=person.get("first_name", ""),
-                lastname=person.get("last_name", ""),
-                email=person.get("email", ""),
-                phone=person.get("phone", ""),
-                company=person.get("organization", {}).get("name", ""),
+                firstname=enriched_data.get("first_name", person.get("first_name", "")),
+                lastname=enriched_data.get("last_name", person.get("last_name", "")),
+                email=enriched_data.get("email", person.get("email", "")),
+                phone=enriched_data.get("phone_number", person.get("phone", "")),
+                company=enriched_data.get("organization_name", person.get("organization", {}).get("name", "")),
                 message=""
             )
+            
             email_text = generate_email(lead_data)
             hubspot_response = push_to_hubspot(lead_data)
             lead_score = agent.run(f"Score this lead: {lead_data.firstname} {lead_data.lastname}, role at {lead_data.company}, given that this what we do, SkillUp MENA is the pioneer of e-learning services, with our vast curated e-learning library of over 85000 courses, all offered by the world's leading training providers. Our aim is to simplify the corporate training process by offering a unique engaging learning experience, whilst marinating our partners' business needs.")
             
             # Send email using SMTP
-            send_email_smtp("dina.adel@monstersgraphics.com", f"Exciting Opportunity for {lead_data.firstname} {lead_data.lastname}", email_text)
+            if lead_data.email:  # Only send if we have an email
+                send_email_smtp("dina.adel@monstersgraphics.com", f"Exciting Opportunity for {lead_data.firstname} {lead_data.lastname}", email_text)
         
             leads_created.append({
                 "lead": lead_data.dict(),
