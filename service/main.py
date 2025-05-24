@@ -375,6 +375,9 @@ async def find_leads(query: ApolloSearchRequest):
                 message=""
             )
             
+            # Log final phone info before sending to frontend
+            logger.info(f"Final phone info being sent to frontend: {phone_info}")
+
             # Only add leads that have at least a company name
             if lead_data.company:
                 # Create response with Apollo contact details

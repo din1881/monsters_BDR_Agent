@@ -1,7 +1,7 @@
 // Get the backend URL based on the environment
 const baseURL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? "http://localhost:8000"
-    : "/api"; // When deployed on Vercel, the API is available at /api
+    ? "http://localhost:8000/api"  // Add /api for local development
+    : "/api"; // Keep /api for production
 
 // State management
 let selectedLeads = new Map();
@@ -183,88 +183,130 @@ function removeLead(email) {
     updateSelectedLeadsUI();
 }
 
+// Function to get access key from local storage or prompt user
+function getAccessKey() {
+    // Access key verification disabled
+    return null;
+}
+
+// Function to create headers with access key
+function createHeaders() {
+    return {
+        "Content-Type": "application/json"
+    };
+}
+
+// Function to handle API errors
+async function handleApiResponse(response) {
+    if (!response.ok) {
+        if (response.status === 403) {
+            localStorage.removeItem('accessKey');
+            throw new Error('Invalid access key. Please try again.');
+        }
+        
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.detail || `API Error: ${response.status}`;
+        console.error('API Error:', {
+            status: response.status,
+            url: response.url,
+            error: errorMessage
+        });
+        throw new Error(errorMessage);
+    }
+    return response.json();
+}
+
 // Create Lead Form
 document.getElementById("createLeadForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const form = e.target;
+  e.preventDefault();
+  const form = e.target;
     const submitButton = form.querySelector('button[type="submit"]');
     
-    const data = {
-        firstname: form.firstname.value,
-        lastname: form.lastname.value,
-        email: form.email.value,
-        phone: form.phone.value,
-        company: form.company.value,
-        message: form.message.value || ""
-    };
+  const data = {
+    firstname: form.firstname.value,
+    lastname: form.lastname.value,
+    email: form.email.value,
+    phone: form.phone.value,
+    company: form.company.value,
+    message: form.message.value || ""
+  };
 
     if (isLeadProcessed(data.email)) {
         alert("This lead has already been processed.");
         return;
     }
 
-    try {
+  try {
         submitButton.disabled = true;
         showLoading();
         
-        const response = await fetch(`${baseURL}/create-lead`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data)
-        });
+    const response = await fetch(`${baseURL}/create-lead`, {
+      method: "POST",
+            headers: createHeaders(),
+      body: JSON.stringify(data)
+    });
 
-        const result = await response.json();
-        document.getElementById("results").innerHTML = `
-            <div class="card">
+        const result = await handleApiResponse(response);
+    document.getElementById("results").innerHTML = `
+      <div class="card">
                 <h3 class="lead-title">✅ Lead Created</h3>
                 <p class="lead-detail"><strong>Email:</strong> ${result.email}</p>
                 <p class="lead-detail"><strong>Score:</strong> ${result.score}</p>
-            </div>
-        `;
+      </div>
+    `;
         markLeadAsProcessed(data);
         form.reset();
-    } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to create lead.");
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Failed to create lead.");
     } finally {
         submitButton.disabled = false;
         hideLoading();
-    }
+  }
 });
 
 // Find Leads Form
 document.getElementById("findLeadsForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const form = e.target;
+  e.preventDefault();
+  const form = e.target;
     const submitButton = form.querySelector('button[type="submit"]');
+    const resultsDiv = document.getElementById("results");
     
-    const data = {
-        job_title: form.job_title.value,
-        organization_name: form.organization_name.value,
-        location: form.location.value,
+  const data = {
+    job_title: form.job_title.value,
+    organization_name: form.organization_name.value,
+    location: form.location.value,
         industry_tag: form.industry_tag.value,
         exclude_emails: Array.from(processedLeads)
-    };
+  };
 
-    try {
+  try {
         submitButton.disabled = true;
         showLoading();
         
-        const response = await fetch(`${baseURL}/find-leads`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
+        console.log('Sending request to:', `${baseURL}/find-leads`);
+        console.log('Request data:', data);
         
+    const response = await fetch(`${baseURL}/find-leads`, {
+      method: "POST",
+            headers: createHeaders(),
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+        console.log('API Response:', result);
+
+        if (!result.results) {
+            throw new Error('Invalid API response: missing results array');
+        }
+
+        if (result.error) {
+            throw new Error(result.error);
+        }
+
         if (result.results.length === 0) {
-            document.getElementById("results").innerHTML = `
-                <div class="card">
+            resultsDiv.innerHTML = `
+      <div class="card">
                     <h3>No new leads found</h3>
                     <p>All matching leads have already been processed. Try different search criteria.</p>
                 </div>
@@ -276,10 +318,15 @@ document.getElementById("findLeadsForm").addEventListener("submit", async (e) =>
             .map(res => createLeadCard(res.lead, res.apollo_contact_info))
             .join("");
 
-        document.getElementById("results").innerHTML = html;
+        resultsDiv.innerHTML = html;
     } catch (error) {
         console.error("Error:", error);
-        alert("Failed to fetch leads.");
+        resultsDiv.innerHTML = `
+            <div class="card error">
+                <h3>Error</h3>
+                <p>${error.message}</p>
+      </div>
+        `;
     } finally {
         submitButton.disabled = false;
         hideLoading();
@@ -303,16 +350,14 @@ document.getElementById("processSelectedLeads").addEventListener("click", async 
         
         const response = await fetch(`${baseURL}/process-leads`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: createHeaders(),
             body: JSON.stringify({
                 leads: leads,
                 send_immediately: sendImmediately
             })
         });
 
-        const result = await response.json();
+        const result = await handleApiResponse(response);
         
         // Mark processed leads
         result.results.forEach(res => {
@@ -338,16 +383,16 @@ document.getElementById("processSelectedLeads").addEventListener("click", async 
             </div>`);
         }).join("");
 
-        document.getElementById("results").innerHTML = html;
+    document.getElementById("results").innerHTML = html;
         
         // Clear selected leads after processing
         selectedLeads.clear();
         updateSelectedLeadsUI();
-    } catch (error) {
-        console.error("Error:", error);
+  } catch (error) {
+    console.error("Error:", error);
         alert("Failed to process leads.");
     } finally {
         button.disabled = false;
         hideLoading();
-    }
+  }
 });
