@@ -1,2 +1,21 @@
-# Ignore environment variable files
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
 .env
+venv/
+.venv/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Vercel
+.vercel/
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+.DS_Store

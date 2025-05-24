@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: lead-finder-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APOLLO_API_KEY
+        sync: false
+      - key: HUBSPOT_PRIVATE_TOKEN
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+
+  - type: static
+    name: lead-finder-frontend
+    buildCommand: echo "Static site, no build needed"
+    staticPublishPath: ./frontend
+    headers:
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*" 

@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SkillUp Lead Portal</title>
+  <title>MonsterGraphics Lead Portal</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>🎯 SkillUp Lead Portal</h1>
+    <h1>🎯 MonsterGraphics Lead Portal</h1>
 
     <div class="card">
       <h2>Create Lead</h2>
@@ -34,8 +34,20 @@
       </form>
     </div>
 
-    <!-- Added scrolling to the results container -->
-    <div id="results" class="results-container"></div>
+    <div id="results" class="results-container">
+      <!-- Results will be displayed here -->
+    </div>
+
+    <div id="selectedLeads" class="card" style="display: none;">
+      <h2>Selected Leads</h2>
+      <div class="selected-leads-list"></div>
+      <div class="process-controls">
+        <label>
+          <input type="checkbox" id="sendImmediately" /> Send emails immediately
+        </label>
+        <button id="processSelectedLeads">Process Selected Leads</button>
+      </div>
+    </div>
   </div>
 
   <script src="script.js"></script>

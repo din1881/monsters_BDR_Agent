@@ -27,11 +27,11 @@ h1 {
 
 input, textarea {
     width: 100%;
-    padding: 8px 10px; /* Reduced padding to make them smaller */
-    margin: 8px 0; /* Reduced margin */
+    padding: 8px 10px;
+    margin: 8px 0;
     border: 1px solid #ddd;
     border-radius: 12px;
-    font-size: 14px; /* Smaller font size */
+    font-size: 14px;
 }
 
 button {
@@ -49,9 +49,199 @@ button:hover {
     background-color: #303f9f;
 }
 
+button:disabled {
+    background-color: #9fa8da;
+    cursor: not-allowed;
+}
+
 /* Scrolling functionality for the results section */
 .results-container {
     max-height: 400px; /* Set the height limit for the scrolling container */
     overflow-y: auto;  /* Enable vertical scrolling */
     padding-right: 10px; /* Prevent content from being cut off */
+}
+
+.lead-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lead-card:hover {
+    transform: translateY(-2px);
+}
+
+.lead-info {
+    flex-grow: 1;
+}
+
+.lead-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.selected-leads-list {
+    margin-bottom: 15px;
+}
+
+.process-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.success {
+    color: #4caf50;
+}
+
+.error {
+    color: #f44336;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.pending {
+    background-color: #fff3e0;
+    color: #ff9800;
+}
+
+.status-badge.success {
+    background-color: #e8f5e9;
+    color: #4caf50;
+}
+
+.status-badge.error {
+    background-color: #ffebee;
+    color: #f44336;
+}
+
+/* Loading Spinner */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3f51b5;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Lead Card Improvements */
+.lead-title {
+    color: #3f51b5;
+    margin: 0 0 10px 0;
+}
+
+.lead-detail {
+    margin: 5px 0;
+    color: #666;
+}
+
+.lead-description {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    font-style: italic;
+    color: #666;
+}
+
+.contact-info {
+    margin-top: 10px;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.phone-number {
+    color: #3f51b5;
+    font-weight: 500;
+}
+
+/* Company Information */
+.company-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.company-description {
+    margin: 10px 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.linkedin-link {
+    display: inline-flex;
+    align-items: center;
+    color: #0077b5;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 5px;
+    gap: 5px;
+}
+
+.linkedin-link:hover {
+    text-decoration: underline;
+}
+
+.linkedin-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+}
+
+/* Sections */
+.person-section, .company-section {
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #3f51b5;
+    margin-bottom: 10px;
 }
